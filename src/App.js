@@ -9,6 +9,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SignUp from "./SignUp";
 import Home from "./Home";
 import SignIn from "./SignIn";
+import ProfileSetting from "./ProfileSetting";
+import CreatePost from "./CreatePost";
+
 
 
 function App() {
@@ -18,6 +21,8 @@ function App() {
         <Route path={`/`} element={<SignUp />} />
         <Route path={`/home`} element={<Home />} />
         <Route path={`/signin`} element={<SignIn />} />
+        <Route path={`/profileSetting`} element={<ProfileSetting />} />
+        <Route path={`/create_post`} element={<CreatePost />} />
       </Routes>
     </BrowserRouter>
   );

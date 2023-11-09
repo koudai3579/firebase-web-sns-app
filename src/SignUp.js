@@ -32,7 +32,7 @@ export default function SignUp() {
 
   //SignUpに成功した場合、次のページへ遷移
   const signUpSuccess = () => {
-    navigate("/home");
+    navigate("/profileSetting");
 }
 
   return (
