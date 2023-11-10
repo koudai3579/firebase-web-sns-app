@@ -2,14 +2,7 @@ import { Link } from 'react-router-dom';
 import Header from './Header';
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Paper,
-  Typography,
-  Box,
-  TextField,
-  Button,
-  Container,
-} from "@mui/material";
+import {Paper,Typography,Box,TextField,Button,Container,} from "@mui/material";
 
 function ProfileSetting() {
     const navigate = useNavigate();
@@ -35,7 +28,7 @@ function ProfileSetting() {
             required
             fullWidth
             id="name"
-            label="ユーザー名"
+            label="ニックネーム"
             name="name"
             autoComplete="name"
             autoFocus
