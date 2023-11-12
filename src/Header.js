@@ -3,17 +3,22 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import {getAuth} from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 function Header() {
 
-    //ログアウト処理
-    const handleLogout = () => {
-        //JavaScript標準アラート
-        const confirm = window.confirm("ログアウトしますか？");
-　　    if (confirm) {
-        //ログアウト処理(OK)
-        }
-    };
+  const navigate = useNavigate();
+
+  //ログアウト処理
+  const LogOutButtonAction = () => {
+    const confirm = window.confirm("ログアウトしますか？");
+    if (confirm == true) {
+      const auth = getAuth()
+      auth.signOut();
+      navigate("/");
+    }
+  };
 
   return (
     <AppBar position="static">
@@ -21,7 +26,7 @@ function Header() {
         <Typography variant="h6">
           My App
         </Typography>
-        <Button color="inherit" onClick={handleLogout}>
+        <Button color="inherit" onClick={LogOutButtonAction}>
           ログアウト
         </Button>
       </Toolbar>

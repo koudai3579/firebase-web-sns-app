@@ -14,19 +14,38 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom"
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { useState } from "react";
+
 
 const defaultTheme = createTheme();
 
 export default function SignUp() {
     const navigate = useNavigate();
-    const auth = getAuth();//これが原因
+    const auth = getAuth();
+    const [checked, setChecked] = useState(false);
+
 
     //SignUpボタンが押された時の処理
     const handleSubmit = (event) => {
         event.preventDefault();
+
         const data = new FormData(event.currentTarget);
         const email = data.get('email')
         const password = data.get('password')
+
+        if (checked == false) {
+            alert("年齢に関するチェックボックスをご確認ください。")
+            return
+        }
+        if (email.length < 1){
+            alert("emailが空欄になっています。")
+            return
+        }
+        if (password.length < 6){
+            alert("パスワードは6文字以上でご入力ください。")
+            return
+        }
+
 
         createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
             alert("ユーザー登録に成功しました。")
@@ -54,7 +73,7 @@ export default function SignUp() {
                         <LockOutlinedIcon />
                     </Avatar>
                     <Typography component="h1" variant="h5">
-                        Sign up
+                        新規ユーザー作成
                     </Typography>
                     <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
                         <Grid container spacing={2}>
@@ -81,7 +100,11 @@ export default function SignUp() {
                             </Grid>
                             <Grid item xs={12}>
                                 <FormControlLabel
-                                    control={<Checkbox value="allowExtraEmails" color="primary" />}
+                                    control={<Checkbox
+                                    checked={checked} 
+                                    onChange={(event) => setChecked(event.target.checked)}
+                                    // value="allowExtraEmails"
+                                    color="primary" />}
                                     label="18歳以上ですか？"
                                 />
                             </Grid>
@@ -92,7 +115,7 @@ export default function SignUp() {
                             variant="contained"
                             sx={{ mt: 3, mb: 2 }}
                         >
-                            Sign Up
+                           新規ユーザー作成
                         </Button>
                         <Grid container justifyContent="flex-end">
                             <Grid item>
