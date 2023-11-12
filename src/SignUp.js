@@ -19,7 +19,7 @@ const defaultTheme = createTheme();
 
 export default function SignUp() {
     const navigate = useNavigate();
-    const auth = getAuth();
+    const auth = getAuth();//これが原因
 
     //SignUpボタンが押された時の処理
     const handleSubmit = (event) => {
@@ -96,7 +96,8 @@ export default function SignUp() {
                         </Button>
                         <Grid container justifyContent="flex-end">
                             <Grid item>
-                                <Link to="/signin" variant="body2">新規アカウント作成はこちらから</Link>              </Grid>
+                                <Link to="/signin" variant="body2">ログインはこちらから</Link>            
+                            </Grid>
                         </Grid>
                     </Box>
                 </Box>

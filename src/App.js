@@ -5,14 +5,17 @@
 //各ページを呼び出し、react-router-domでルーティングを行う(画面遷移設定)
 
 import * as React from "react";
+import "./App.css"
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+// 遷移先コンポーネントのインポート
 import SignUp from "./SignUp";
 import Home from "./Home";
 import SignIn from "./SignIn";
 import ProfileSetting from "./ProfileSetting";
 import CreatePost from "./CreatePost";
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
       <Routes>
@@ -24,5 +27,4 @@ function App() {
       </Routes>
     </BrowserRouter>
   );
-};
-export default App;
+}
