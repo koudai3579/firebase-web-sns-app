@@ -12,6 +12,9 @@ import { format } from "date-fns";
 import { addDoc, collection } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import userEvent from "@testing-library/user-event";
+
 
 //投稿完了モーダルウィンドウ（ポップアップ）
 function Modal({ show, setShow }) {
@@ -74,15 +77,25 @@ function CreatePost() {
             alert("err：ユーザーがログイン状態ではありません。")
             return
         }
-        addDoc(collection(db, "Posts"), {
-            title: title,
-            content: content,
-            date: format(new Date(), 'yyyy/MM/dd HH:mm'),
-            imageUrl: selectingImageUrl,
-            userUid: uid,
-        });
-        //投稿完了ポップアップ
-        setShow(true)
+        const userData = doc(db, "users", uid);
+        //ユーザーのプロフィール画像URLを取得するためにユーザーUIDに基づくドキュメントを取得
+        getDoc(userData).then((snapShot) => {
+            if (snapShot.exists()) {
+                addDoc(collection(db, "Posts"), {
+                    title: title,
+                    content: content,
+                    date: format(new Date(), 'yyyy/MM/dd HH:mm'),
+                    imageUrl: selectingImageUrl,
+                    userUid: uid,
+                    userImageUrl: snapShot.data().profileImageUrl,
+                });
+                //投稿完了ポップアップ
+                setShow(true)
+            } else {
+                alert("err：処理に失敗しました。")
+            }
+        })
+
     }
 
     return (
