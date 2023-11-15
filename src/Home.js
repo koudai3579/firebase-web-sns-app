@@ -16,9 +16,32 @@ import logo from "./Images/logo.png"
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialIcon from '@mui/material/SpeedDialIcon';
 import Fab from '@mui/material/Fab';
+//投稿内容を表示するためのライブラリ
+import { collection, getDocs } from "firebase/firestore";
+import { useEffect } from "react";
+import { storage, db } from "./firebase";
 
 
 function Home() {
+
+    const postDatas = [];
+    const [posts, setPosts] = useState([]);
+    let ignore = false;
+
+    //useEffect():コンポーネントの画面生成後または、更新後に自動実行する関数処理を設定するHooks
+    useEffect(() => {
+        const postData = collection(db, "Posts");
+        if (ignore == false) {
+            getDocs(postData).then((snapShot) => {
+                snapShot.forEach((docs) => {
+                    const doc = docs.data();
+                    postDatas.push({ title: doc.title, content: doc.content, date: doc.date, userImageUrl: doc.userImageUrl, userUid: doc.userUid ,imageUrl:doc.imageUrl});
+                })
+                setPosts(postDatas);
+            });
+        }
+        ignore = true;
+    }, []);
 
     return (
         <div>
@@ -27,41 +50,47 @@ function Home() {
 
             {/* コンテンツ */}
             <br></br>
-            <Box
-                sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', }}
-            >
-                
-                <Card sx={{ maxWidth: 500 }}>
-                    <CardHeader
-                        avatar={
-                            <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe"></Avatar>
-                        }
-                        action={
-                            <IconButton aria-label="settings"></IconButton>
-                        }
-                        title="タイトル"
-                        subheader="2023/11/14"
-                    />
-                    <CardMedia
-                        component="img"
-                        height="194"
-                        image={logo}
-                        alt="image"
-                    />
-                    <CardContent>
-                        <Typography variant="body2" color="text.secondary">
-                            This impressive paella is a perfect party dish and a fun meal to cook
-                            together with your guests.
-                        </Typography>
-                    </CardContent>
-                    <CardActions disableSpacing>
-                        <IconButton aria-label="add to favorites">
-                            <FavoriteIcon />
-                        </IconButton>
-                    </CardActions>
-                </Card>
+            <div>
+                {posts.map(post => post.title ?
+                    <Link to={"/"} state={{ title: post.title, content: post.content, date: post.date, userImageUrl: post.userImageUrl, userUid: post.userUid,imageUrl:post.imageUrl }}>
 
-            </Box>
+                        <Box
+                            sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', }}
+                        >
+
+                            <Card sx={{ width: 500}}>
+                                <CardHeader
+                                    avatar={
+                                        <Avatar sx={{ bgcolor: red[500] }} src={post.userImageUrl} aria-label="recipe"></Avatar>
+                                    }
+                                    action={
+                                        <IconButton aria-label="settings"></IconButton>
+                                    }
+                                    title={post.title}
+                                    subheader={post.date}
+                                    sx={{ textDecoration: 'none' }}//←変化なし
+                                />
+                                <CardMedia
+                                    component="img"
+                                    height="194"
+                                    image={post.imageUrl}
+                                    alt="image"
+                                />
+                                <CardContent>
+                                    <Typography variant="body2" color="text.secondary">{post.content}</Typography>
+                                </CardContent>
+                                <CardActions disableSpacing>
+                                    <IconButton aria-label="add to favorites">
+                                        <FavoriteIcon />
+                                    </IconButton>
+                                </CardActions>
+                            </Card>
+                        </Box>
+                        <br></br>
+                    </Link>
+                    : <></>
+                )}
+            </div>
 
             {/* 右下固定投稿ボタン */}
             <Link to={"/create_post"}>
@@ -69,8 +98,8 @@ function Home() {
                     ariaLabel="SpeedDial basic example"
                     sx={{
                         position: 'fixed',
-                        bottom: 73,
-                        right: 18,
+                        bottom: 50,
+                        right: 50,
                         zIndex: 9999,
                     }}
                     icon={
