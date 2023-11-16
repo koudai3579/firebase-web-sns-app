@@ -52,7 +52,7 @@ function Home() {
             <br></br>
             <div>
                 {posts.map(post => post.title ?
-                    <Link to={"/"} state={{ title: post.title, content: post.content, date: post.date, userImageUrl: post.userImageUrl, userUid: post.userUid,imageUrl:post.imageUrl }}>
+                    <Link to={"/postDetail"} state={{ title: post.title, content: post.content, date: post.date, userImageUrl: post.userImageUrl, userUid: post.userUid,imageUrl:post.imageUrl }}>
 
                         <Box
                             sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', }}

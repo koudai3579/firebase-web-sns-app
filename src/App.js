@@ -14,6 +14,7 @@ import Home from "./Home";
 import SignIn from "./SignIn";
 import ProfileSetting from "./ProfileSetting";
 import CreatePost from "./CreatePost";
+import PostDetail from "./PostDetail";
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
         <Route path={`/signin`} element={<SignIn />} />
         <Route path={`/profileSetting`} element={<ProfileSetting />} />
         <Route path={`/create_post`} element={<CreatePost />} />
+        <Route path={`/postDetail`} element={<PostDetail />} />
       </Routes>
     </BrowserRouter>
   );
