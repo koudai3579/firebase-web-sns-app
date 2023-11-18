@@ -19,6 +19,8 @@ import { Link } from "react-router-dom";
 
 // useStateのインポート
 import React, { useState } from 'react';
+import Header from './Header';
+
 
 // フッターを表示するためのライブラリ
 import BottomNavigation from '@mui/material/BottomNavigation';
@@ -44,6 +46,8 @@ import Button from '@mui/material/Button';
 import ReplyIcon from '@mui/icons-material/Reply';
 
 // 相談の一覧を表示するためのライブラリ
+import Grid from '@mui/material/Grid';
+
 import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
@@ -84,51 +88,131 @@ function PostDetail() {
 
     return (
         <div>
-            {/* コンテンツ */}
-            <div style={{ paddingTop: '40px', paddingBottom: '40px' }}>
+            {/* ヘッダー */}
+            <Header />
 
-                <Box
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                    }}
-                >
-                    <Card sx={{ width: 500, }}>
-                        <CardHeader
-                            avatar={
-                                <Avatar sx={{ bgcolor: '#BEDFC2' }} src={state.userImageUrl} aria-label="guardian">
-                                </Avatar>
-                            }
-                            title={state.title}
-                            subheader={
-                                <Typography variant="body2" color="text.secondary">
-                                    投稿時刻:{state.date}
-                                </Typography>
-                            }
-                        />
-                        <CardMedia
-                            component="img"
-                            //height={100}
-                            width={200}
-                            image={state.imageUrl}
-                            alt="image"
-                        // inputMode="fill"
-                        //style={{ display: state.imageUrl ? 'block' : 'none' }}
-                        />
-                        <CardContent>
-                            <Typography variant="body2" color="black">
-                                {state.content}
-                            </Typography>
-                        </CardContent>
-                        <CardActions disableSpacing>
-                            <IconButton aria-label="add to favorites">
-                                <FavoriteIcon />
-                            </IconButton>
-                        </CardActions>
-                    </Card>
-                </Box>
-            </div>
+            {/* Gridレイアウトで2カラムの構成にする */}
+            <Grid container>
+                {/* 左側コンテンツ(投稿詳細) */}
+                <Grid item xs={5}>
+                    <div style={{ paddingTop: '40px', paddingBottom: '40px' }}>
+
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <Card sx={{ width: "100%" }}>
+                                <CardHeader
+                                    avatar={
+                                        <Avatar sx={{ bgcolor: '#BEDFC2' }} src={state.userImageUrl} aria-label="guardian">
+                                        </Avatar>
+                                    }
+                                    title={state.title}
+                                    subheader={
+                                        <Typography variant="body2" color="text.secondary">
+                                            投稿時刻:{state.date}
+                                        </Typography>
+                                    }
+                                />
+                                <CardMedia
+                                    component="img"
+                                    //height={100}
+                                    width={200}
+                                    image={state.imageUrl}
+                                    alt="image"
+                                // inputMode="fill"
+                                //style={{ display: state.imageUrl ? 'block' : 'none' }}
+                                />
+                                <CardContent>
+                                    <Typography variant="body2" color="black">
+                                        {state.content}
+                                    </Typography>
+                                </CardContent>
+                                <CardActions disableSpacing>
+                                    <IconButton aria-label="add to favorites">
+                                        <FavoriteIcon />
+                                    </IconButton>
+                                </CardActions>
+                            </Card>
+                        </Box>
+                    </div>
+                </Grid>
+
+                <Grid item xs={5}>
+                    {/* 右側コンテンツ(コメント) */}
+                    <div style={{ paddingTop: '40px', paddingBottom: '40px' ,paddingLeft:'40px'}}>
+
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}
+                        >
+                            <Typography variant="h5" style={{ fontWeight: 'bold' }}>コメント一覧</Typography>
+                        </Box>
+
+                        <br></br>
+
+                        <div>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <Card sx={{ width: '100%' }}>
+                                    <CardHeader
+                                        avatar={
+                                            <Avatar sx={{ bgcolor: '#f3cbc3' }} aria-label="teacher">
+                                            </Avatar>
+                                        }
+                                        subheader={
+                                            <Typography variant="body2" color="text.secondary">
+                                                送信時刻:fffffffffffffff
+                                            </Typography>
+                                        }
+                                    />
+                                    <CardContent>
+                                        <Typography variant="body2" color="black">
+                                            ddddddddd
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </Box>
+
+                            <br></br>
+                        </div>
+                        <br></br>
+
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'row'
+                            }}
+                        >
+                             <TextField
+                                id="standard-password-input"
+                                label="コメント"
+                                type="ID"
+                                autoComplete="current-password"
+                                variant="standard"
+                                multiline
+                            />
+
+                            <Button variant="contained" endIcon={<ReplyIcon />} style={{ color: "black", backgroundColor: "#BEDFC2" }}>
+                                送信
+                            </Button>           
+
+                        </Box>
+                    </div>
+
+                </Grid>
+            </Grid>
         </div>
 
     );
