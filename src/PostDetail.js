@@ -10,9 +10,7 @@
 // import { v4 as uuidv4 } from 'uuid';
 // import { format } from "date-fns";
 // import { addDoc, collection } from "firebase/firestore";
-// import { getAuth } from "firebase/auth";
 // import { useNavigate } from "react-router-dom";
-// import { doc, getDoc } from "firebase/firestore";
 
 // 画面遷移用のモジュールのインポート
 import { Link } from "react-router-dom";
@@ -76,15 +74,46 @@ import { useEffect } from "react";
 import { useRef } from "react";
 import { db } from "./firebase";
 import { collection, addDoc } from "firebase/firestore";
+import { doc, getDoc,setDoc } from "firebase/firestore";
 import { format } from "date-fns";
+import { v4 as uuidv4 } from 'uuid';
+import { getAuth } from "firebase/auth";
 
-//返信内容を取得するためのライブラリ
-import { getDocs } from "firebase/firestore";
 
 function PostDetail() {
 
     // 遷移してきたStateを管理するためのもの
     const { state } = useLocation();
+    const [commentText, setCommentText] = useState("");
+    const [show, setShow] = useState(false);
+
+    const commentSaveAction = () =>{
+        const uid = getAuth().currentUser.uid
+        if (!uid) {
+            alert("err：ユーザーがログイン状態ではありません。")
+            return
+        }
+        const commentUid = uuidv4();
+        //まずはユーザー情報を取得する
+        const userData = doc(db, "users", uid);
+        getDoc(userData).then((snapShot) => {
+            if (snapShot.exists()) {
+                addDoc(collection(db, 'Posts', state.postUid, 'Comments'), {
+                    comment: commentText,
+                    date: format(new Date(), 'yyyy/MM/dd HH:mm'),
+                    userUid: uid,
+                    userImageUrl: snapShot.data().profileImageUrl,                    
+                });
+                //投稿完了ポップアップ
+                //setShow(true)
+                //入力UI初期化
+
+            } else {
+                alert("err:処理に失敗しました。")
+            }
+        })
+
+    }
 
     return (
         <div>
@@ -196,15 +225,16 @@ function PostDetail() {
                             }}
                         >
                              <TextField
-                                id="standard-password-input"
+                                id="comment-input"
                                 label="コメント"
                                 type="ID"
-                                autoComplete="current-password"
+                                //autoComplete="current-password"
                                 variant="standard"
                                 multiline
+                                onChange={(e) => setCommentText(e.target.value)}
                             />
 
-                            <Button variant="contained" endIcon={<ReplyIcon />} style={{ color: "black", backgroundColor: "#BEDFC2" }}>
+                            <Button variant="contained" endIcon={<ReplyIcon />} style={{ color: "black", backgroundColor: "#BEDFC2" }} onClick={commentSaveAction}>
                                 送信
                             </Button>           
 

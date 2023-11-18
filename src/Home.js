@@ -27,6 +27,12 @@ function Home() {
     const postDatas = [];
     const [posts, setPosts] = useState([]);
     let ignore = false;
+    const [favorites, setFavorites] = useState({});
+
+    const handleFavoriteClick = (post) => {
+        // const currentFavoriteState = favorites[post.userUid] || false;
+        // setFavorites({ ...favorites, [post.userUid]: !currentFavoriteState });
+    };
 
     //useEffect():コンポーネントの画面生成後または、更新後に自動実行する関数処理を設定するHooks
     useEffect(() => {
@@ -35,7 +41,7 @@ function Home() {
             getDocs(postData).then((snapShot) => {
                 snapShot.forEach((docs) => {
                     const doc = docs.data();
-                    postDatas.push({ title: doc.title, content: doc.content, date: doc.date, userImageUrl: doc.userImageUrl, userUid: doc.userUid ,imageUrl:doc.imageUrl});
+                    postDatas.push({postUid:doc.postUid, title: doc.title, content: doc.content, date: doc.date, userImageUrl: doc.userImageUrl, userUid: doc.userUid ,imageUrl:doc.imageUrl});
                 })
                 setPosts(postDatas);
             });
@@ -52,7 +58,7 @@ function Home() {
             <br></br>
             <div>
                 {posts.map(post => post.title ?
-                    <Link to={"/postDetail"} state={{ title: post.title, content: post.content, date: post.date, userImageUrl: post.userImageUrl, userUid: post.userUid,imageUrl:post.imageUrl }}>
+                    <Link to={"/postDetail"} state={{ postUid:post.postUid ,title: post.title, content: post.content, date: post.date, userImageUrl: post.userImageUrl, userUid: post.userUid,imageUrl:post.imageUrl }}>
 
                         <Box
                             sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', }}
@@ -80,7 +86,12 @@ function Home() {
                                     <Typography variant="body2" color="text.secondary">{post.content}</Typography>
                                 </CardContent>
                                 <CardActions disableSpacing>
-                                    <IconButton aria-label="add to favorites">
+                                    <IconButton 
+                                    aria-label="add to favorites"
+                                    onClick={(e) => {
+                                        handleFavoriteClick(post);
+                                    }}    
+                                    >
                                         <FavoriteIcon />
                                     </IconButton>
                                 </CardActions>
