@@ -89,6 +89,7 @@ function CreatePost() {
                     userUid: uid,
                     userImageUrl: snapShot.data().profileImageUrl,
                     postUid:postUid,
+                    favoriteUsers:[String](),
                 });
                 //投稿完了ポップアップ
                 setShow(true)

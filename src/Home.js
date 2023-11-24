@@ -83,18 +83,8 @@ function Home() {
                                     alt="image"
                                 />
                                 <CardContent>
-                                    <Typography variant="body2" color="text.secondary">{post.content}</Typography>
+                                    <Typography variant="body2" color="text.secondary" style={{ whiteSpace: 'pre-line' }}>{post.content}</Typography>
                                 </CardContent>
-                                <CardActions disableSpacing>
-                                    <IconButton 
-                                    aria-label="add to favorites"
-                                    onClick={(e) => {
-                                        handleFavoriteClick(post);
-                                    }}    
-                                    >
-                                        <FavoriteIcon />
-                                    </IconButton>
-                                </CardActions>
                             </Card>
                         </Box>
                         <br></br>

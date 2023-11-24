@@ -74,7 +74,7 @@ import { useEffect } from "react";
 import { useRef } from "react";
 import { db } from "./firebase";
 import { collection, addDoc } from "firebase/firestore";
-import { doc, getDoc,setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, getDocs } from "firebase/firestore";
 import { format } from "date-fns";
 import { v4 as uuidv4 } from 'uuid';
 import { getAuth } from "firebase/auth";
@@ -86,8 +86,76 @@ function PostDetail() {
     const { state } = useLocation();
     const [commentText, setCommentText] = useState("");
     const [show, setShow] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [comments, setComments] = useState([]);
 
-    const commentSaveAction = () =>{
+    const handleFavoriteClick = () => {
+        setIsFavorite(!isFavorite);
+        if (isFavorite == false) {
+            favoriteRegisterAction()
+        } else {
+            favoriteCanselAction()
+        }
+    };
+
+    //最新の投稿データを取得し、お気に入りしたユーザーのUID情報を追加(再取得するのは漏れをなくすため)
+    const favoriteRegisterAction = () => {
+        const uid = getAuth().currentUser.uid
+        if (!uid) {
+            alert("err：ユーザーがログイン状態ではありません。")
+            return
+        }
+        const userData = doc(db, "Posts", state.postUid);
+        getDoc(userData).then((snapShot) => {
+            if (snapShot.exists()) {
+                const favoriteUsers = snapShot.data().favoriteUsers
+                favoriteUsers.push(uid)
+                const postRef = doc(db, "Posts", state.postUid);
+                updateDoc(postRef, {
+                    favoriteUsers: favoriteUsers,
+                });
+            } else {
+                alert("err:処理に失敗しました。")
+            }
+        })
+    }
+
+    //最新の投稿データを取得し、お気に入りしたユーザーのUID情報を削除(再取得するのは漏れをなくすため)
+    const favoriteCanselAction = () => {
+        const uid = getAuth().currentUser.uid
+        if (!uid) {
+            alert("err：ユーザーがログイン状態ではありません。")
+            return
+        }
+        const userData = doc(db, "Posts", state.postUid);
+        getDoc(userData).then((snapShot) => {
+            if (snapShot.exists()) {
+                const favoriteUsers = snapShot.data().favoriteUsers
+                //filterメソッドで自身のUIDのみを削除した新しい配列を定義
+                const newfavoriteUsers = favoriteUsers.filter(item => item !== uid);
+                const postRef = doc(db, "Posts", state.postUid);
+                updateDoc(postRef, {
+                    favoriteUsers: newfavoriteUsers,
+                });
+            } else {
+                alert("err:処理に失敗しました。")
+            }
+        })
+    }
+
+    const FetchCommentData = () => {
+        const commentData = collection(db, 'Posts', state.postUid, 'Comments');
+        getDocs(commentData).then((snapShot) => {
+            const comments = []
+            snapShot.forEach((docs) => {
+                const doc = docs.data();
+                comments.push({ comment: doc.comment, date: doc.date, userImageUrl: doc.userImageUrl, userUid: doc.userUid });
+            })
+            setComments(comments);
+        })
+    }
+
+    const commentSaveAction = () => {
         const uid = getAuth().currentUser.uid
         if (!uid) {
             alert("err：ユーザーがログイン状態ではありません。")
@@ -102,18 +170,25 @@ function PostDetail() {
                     comment: commentText,
                     date: format(new Date(), 'yyyy/MM/dd HH:mm'),
                     userUid: uid,
-                    userImageUrl: snapShot.data().profileImageUrl,                    
+                    userImageUrl: snapShot.data().profileImageUrl,
                 });
                 //投稿完了ポップアップ
                 //setShow(true)
                 //入力UI初期化
+                //
+                setCommentText("")
+                FetchCommentData()
 
             } else {
                 alert("err:処理に失敗しました。")
             }
         })
-
     }
+
+    //useEffect():コンポーネントの画面生成後または、更新後に自動実行する関数処理を設定するHooks
+    useEffect(() => {
+        FetchCommentData()
+    }, []);
 
     return (
         <div>
@@ -161,7 +236,9 @@ function PostDetail() {
                                     </Typography>
                                 </CardContent>
                                 <CardActions disableSpacing>
-                                    <IconButton aria-label="add to favorites">
+                                    <IconButton aria-label="add to favorites" onClick={handleFavoriteClick}
+                                        style={{ color: isFavorite ? 'red' : 'gray' }}
+                                    >
                                         <FavoriteIcon />
                                     </IconButton>
                                 </CardActions>
@@ -172,7 +249,7 @@ function PostDetail() {
 
                 <Grid item xs={5}>
                     {/* 右側コンテンツ(コメント) */}
-                    <div style={{ paddingTop: '40px', paddingBottom: '40px' ,paddingLeft:'40px'}}>
+                    <div style={{ paddingTop: '40px', paddingBottom: '40px', paddingLeft: '40px' }}>
 
                         <Box
                             sx={{
@@ -186,36 +263,38 @@ function PostDetail() {
 
                         <br></br>
 
-                        <div>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                }}
-                            >
-                                <Card sx={{ width: '100%' }}>
-                                    <CardHeader
-                                        avatar={
-                                            <Avatar sx={{ bgcolor: '#f3cbc3' }} aria-label="teacher">
-                                            </Avatar>
-                                        }
-                                        subheader={
-                                            <Typography variant="body2" color="text.secondary">
-                                                送信時刻:fffffffffffffff
+                        {comments.map(comment => comment.comment &&
+                            <div>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    <Card sx={{ width: '100%' }}>
+                                        <CardHeader
+                                            avatar={
+                                                <Avatar sx={{ bgcolor: '#f3cbc3' }} aria-label="teacher" src={comment.userImageUrl}>
+                                                </Avatar>
+                                            }
+                                            subheader={
+                                                <Typography variant="body2" color="text.secondary">
+                                                    送信時刻:{comment.date}
+                                                </Typography>
+                                            }
+                                        />
+                                        <CardContent>
+                                            <Typography variant="body2" color="black">
+                                                {comment.comment}
                                             </Typography>
-                                        }
-                                    />
-                                    <CardContent>
-                                        <Typography variant="body2" color="black">
-                                            ddddddddd
-                                        </Typography>
-                                    </CardContent>
-                                </Card>
-                            </Box>
+                                        </CardContent>
+                                    </Card>
+                                </Box>
+                                <br></br>
+                            </div>
+                        )}
 
-                            <br></br>
-                        </div>
                         <br></br>
 
                         <Box
@@ -224,19 +303,20 @@ function PostDetail() {
                                 flexDirection: 'row'
                             }}
                         >
-                             <TextField
+                            <TextField
                                 id="comment-input"
                                 label="コメント"
                                 type="ID"
                                 //autoComplete="current-password"
                                 variant="standard"
                                 multiline
+                                value={commentText}
                                 onChange={(e) => setCommentText(e.target.value)}
                             />
 
                             <Button variant="contained" endIcon={<ReplyIcon />} style={{ color: "black", backgroundColor: "#BEDFC2" }} onClick={commentSaveAction}>
                                 送信
-                            </Button>           
+                            </Button>
 
                         </Box>
                     </div>
