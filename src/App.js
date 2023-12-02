@@ -1,9 +1,5 @@
-//UI MUI
-//DataBase Firebase
 //実行　npm start
 //shift option F 一括インデント
-//各ページを呼び出し、react-router-domでルーティングを行う(画面遷移設定)
-
 import * as React from "react";
 import "./App.css"
 import { BrowserRouter, Routes, Route } from "react-router-dom";

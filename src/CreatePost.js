@@ -1,5 +1,4 @@
-import { Link } from "react-router-dom";
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -9,17 +8,16 @@ import { ref, uploadBytes } from "firebase/storage"
 import { getStorage, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from 'uuid';
 import { format } from "date-fns";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, setDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { doc, getDoc,setDoc } from "firebase/firestore";
-import userEvent from "@testing-library/user-event";
+import { doc, getDoc } from "firebase/firestore";
+import Header from './Header';
 
 //投稿完了モーダルウィンドウ（ポップアップ）
 function Modal({ show, setShow }) {
 
     const navigate = useNavigate();
-
     const closeModal = () => {
         setShow(false);
         navigate("/home");
@@ -44,8 +42,9 @@ function CreatePost() {
     const [content, setContent] = useState("");
     const [selectingImageUrl, setSelectingImageUrl] = useState('');
     const [show, setShow] = useState(false);
+    const navigate = useNavigate();
 
-    //Storageに画像をアップロード
+    //FirebaseStorageに選択された画像ファイルをアップロード
     const selectingImageChanged = (e) => {
         const file = e.target.files[0];
         const fileName = uuidv4();
@@ -59,7 +58,7 @@ function CreatePost() {
             });
     }
 
-    //Storageから画像のURLを取得する処理
+    //FirebaseStorageから画像のURLを取得
     const fetchImage = (fileName) => {
         const storage = getStorage();
         const starsRef = ref(storage, fileName);
@@ -81,15 +80,16 @@ function CreatePost() {
         //ユーザーのプロフィール画像URLを取得するためにユーザーUIDに基づくドキュメントを取得
         getDoc(userData).then((snapShot) => {
             if (snapShot.exists()) {
-                addDoc(collection(db, "Posts"), {
+                //setDocでドキュメントIDも指定してドキュメントをFirebase上に作成
+                setDoc(doc(db, "Posts", postUid), {
                     title: title,
                     content: content,
                     date: format(new Date(), 'yyyy/MM/dd HH:mm'),
                     imageUrl: selectingImageUrl,
                     userUid: uid,
                     userImageUrl: snapShot.data().profileImageUrl,
-                    postUid:postUid,
-                    favoriteUsers:[String](),
+                    postUid: postUid,
+                    favoriteUsers: [""],
                 });
                 //投稿完了ポップアップ
                 setShow(true)
@@ -97,11 +97,14 @@ function CreatePost() {
                 alert("err:処理に失敗しました。")
             }
         })
-
     }
 
     return (
         <div>
+
+            {/* ヘッダー */}
+            <Header />
+
             {/* コンテンツ */}
             <div style={{ paddingTop: '36px', paddingBottom: '56px' }}>
 
@@ -115,7 +118,6 @@ function CreatePost() {
                     <div className="titleLabel">
                         <h2>タイトル</h2>
                     </div>
-
                 </Box>
 
                 <Box
@@ -192,7 +194,6 @@ function CreatePost() {
                             <input className="imageUploadInput" multiple name="imageURL" type="file" accept="image/*" onChange={selectingImageChanged} />
                         </Button>
                     </div>
-
                 </Box>
 
                 <Box
@@ -202,11 +203,11 @@ function CreatePost() {
                         alignItems: 'center',
                     }}
                 >
-                    <Button variant="contained" onClick={PostButtonClicked} endIcon={<SendIcon />} style={{ color: 'black', backgroundColor: '#BEDFC2', width: '250px', height: '80px', fontSize: '25px' }} >
+                    <Button variant="contained" onClick={PostButtonClicked} endIcon={<SendIcon />} style={{ color: 'black', backgroundColor: '#00ECFF', width: '300px', height: '100px', fontSize: '25px' }} >
                         投稿
                     </Button>
 
-                    {/* モーダルウィンドウ（ポップアップ）　*/}
+                    {/* モーダルウィンドウ（ポップアップ）初期状態は非表示　*/}
                     <Modal show={show} setShow={setShow} />
 
                 </Box>

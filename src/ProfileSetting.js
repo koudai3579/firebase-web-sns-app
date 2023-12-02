@@ -1,21 +1,21 @@
 import React, { useState } from "react";
+import Header from './Header';
 import { useNavigate } from "react-router-dom";
 import { Paper, Typography, Box, TextField, Button, Container, } from "@mui/material";
-import { addDoc, collection } from "firebase/firestore";
-import { Auth, getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { storage, db } from "./firebase";
-
-// 画像機能用のライブラリ
 import { ref, uploadBytes } from "firebase/storage"
 import { getStorage, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from 'uuid';
 
 function ProfileSetting() {
+  
   const [name, setName] = useState('');
   const navigate = useNavigate();
   const [imageUrl, setImageUrl] = useState('');
 
+  //画像ファイルが選択されたらFirebase上のStorageに保存
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     const fileName = uuidv4();
@@ -30,7 +30,7 @@ function ProfileSetting() {
       });
   };
 
-  //Storageから画像のURLを取得する処理
+  //FirebaseStorageから画像のURLを取得
   const fetchImage = (fileName) => {
     const storage = getStorage();
     const starsRef = ref(storage, fileName);
@@ -41,6 +41,7 @@ function ProfileSetting() {
     });
   };
 
+  //ユーザーUIDに紐づくプロフィールデータをFirebase上に生成
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -66,35 +67,49 @@ function ProfileSetting() {
   };
 
   return (
-    <Container maxWidth="sm">
-      <Paper sx={{ m: 4, p: 4 }}>
-        <Typography align="center">プロフィール設定</Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 4 }}>
-          <input type="file" accept="image/*" onChange={handleImageChange} />
+    <div>
+      {/* ヘッダー */}
+      <Header />
 
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            id="name"
-            label="ニックネーム"
-            name="name"
-            autoComplete="name"
-            autoFocus
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            保存
-          </Button>
-        </Box>
-      </Paper>
-    </Container>
+      {/* コンテンツ */}
+      <Container maxWidth="sm">
+
+        <Paper sx={{ m: 4, p: 4 }}>
+          <Typography align="center" fontSize="25px">プロフィール設定</Typography>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 4 }}>
+
+            <Typography align="left" fontSize="15px">①プロフィール写真</Typography>
+            <br></br>
+            <input type="file" accept="image/*" onChange={handleImageChange} />
+            <br></br>
+            <br></br>
+            <Typography align="left" fontSize="15px">②ニックネーム</Typography>
+            <br></br>
+
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="name"
+              label="ニックネーム"
+              name="name"
+              autoComplete="name"
+              autoFocus
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+            >
+              保存
+            </Button>
+          </Box>
+        </Paper>
+      </Container>
+    </div>
   );
 };
 
